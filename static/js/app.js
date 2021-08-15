@@ -1,12 +1,20 @@
 init();
 
 //Create the plots
-function CreatePlot(id) {
+function CreatePlots(id) {
     
     d3.json("samples.json").then((data)=> {
         
+        console.log("Collecting Washing frequency id ", id)
+
+        if(id == undefined)
+        {
+            return;
+        }
+
         // Get sample for id
-        var reqSample = data.samples.filter(s => s.id.toString() === id)[0];                
+        var reqSample = data.samples.filter(sample => sample.id.toString() === id)[0];    
+        console.log("Required sample is ", reqSample)            
         var samplevalues = reqSample.sample_values.slice(0, 10).reverse();
          
         // Get only top 10 otu ids for the plot OTU and reversing it. 
@@ -24,7 +32,7 @@ function CreatePlot(id) {
             y: sorted_OTU,
             text: labels,
             marker: {
-              color: 'cornflowerblue',
+              color: 'steelblue',
                 },
             type:"bar",
             orientation: "h",
@@ -33,7 +41,7 @@ function CreatePlot(id) {
         var barlayout = {
             xaxis:{title: "Top 10 OTUs"},
             height: 475,
-            width: 450
+            width: 470
         };
         var bardata = [bartrace]; 
         Plotly.newPlot("bar", bardata, barlayout);
@@ -53,15 +61,13 @@ function CreatePlot(id) {
           
         var bubblelayout = {
             xaxis:{title: "Comparison of all sample values for "+id},
-            height: 600,
-            width: 1000
+            height: 700,
+            width: 1300
         };
   
         var bubbledata = [bubbletrace];
         Plotly.newPlot("bubble", bubbledata, bubblelayout);                      
-      });
-
-      //LoadGaugeChart(id);  
+      });      
   }  
 
 //Initialize the controls and plots
@@ -75,30 +81,41 @@ function init() {
             .text(name)
             .property("value");
         });
-        CreatePlot(data.names[0]);
+        CreatePlots(data.names[0]);        
         GetDemographicInfo(data.names[0]);
+        LoadGaugeChart(data.names[0]); 
     });
 };
 
 //Option Changed Event Handler
 d3.selectAll("#selDataset").on("change", optionChanged);
 function optionChanged(id){
-    CreatePlot(id);
+    console.log("Value changed to :", id)
+    if(id == undefined)
+    {
+        return;
+    }
+
+    CreatePlots(id);      
     GetDemographicInfo(id);
+    LoadGaugeChart(id);
 };
 
 //Demographic info
 function GetDemographicInfo(id){
+    console.log("Getting demographic for id: ",id);
+    if(id == undefined)
+    {
+        return;
+    }
+
     d3.json("samples.json").then((data)=> {
         var metadata = data.metadata;
-        console.log(metadata);
-
-        //filter demo info data by id
+        
+        //Filter demographic info data by id
         var filterResult = metadata.filter(info => info.id.toString() === id)[0];
 
-        var panelBody = d3.select("#sample-metadata");
-
-        //empty the demo info panel each time before getting new data
+        var panelBody = d3.select("#sample-metadata");        
         panelBody.html("");
 
         Object.entries(filterResult).forEach((key)=>{
