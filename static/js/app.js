@@ -34,7 +34,7 @@ function CreatePlots(id) {
             marker: {
               color: 'steelblue',
                 },
-            type:"bar",
+            type:"bar",            
             orientation: "h",
         }; 
         
@@ -49,7 +49,7 @@ function CreatePlots(id) {
         // The bubble chart
         var bubbletrace = {
             x: reqSample.otu_ids,
-            y: reqSample.sample_values,
+            y: reqSample.sample_values,            
             mode: "markers",
             marker: {
                 size: reqSample.sample_values,
@@ -118,8 +118,9 @@ function GetDemographicInfo(id){
         var panelBody = d3.select("#sample-metadata");        
         panelBody.html("");
 
-        Object.entries(filterResult).forEach((key)=>{
-            panelBody.append("p").text(key[0] + ":" + key[1]);
+        Object.entries(filterResult).forEach(([key, value])=>{
+            panelBody.append("p").text(key + ":" + value);
+            
         });
     });
 };
